@@ -1,4 +1,4 @@
-package com.example.mymovies.data.datasources
+package com.example.mymovies.data.datasources.remote
 
 import com.example.mymovies.domain.Movie
 import retrofit2.http.Query

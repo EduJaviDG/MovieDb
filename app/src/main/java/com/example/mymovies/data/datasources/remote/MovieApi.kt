@@ -1,8 +1,8 @@
-package com.example.mymovies.data.datasources
+package com.example.mymovies.data.datasources.remote
 
 import com.google.gson.annotations.SerializedName
 
-data class MovieDb(
+data class MovieApi(
     @SerializedName("adult")
     val adult: Boolean?,
     @SerializedName("backdrop_path")

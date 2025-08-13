@@ -2,8 +2,8 @@ package com.example.mymovies
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.example.mymovies.data.datasources.MovieDbResult
-import com.example.mymovies.data.datasources.MovieDb
+import com.example.mymovies.data.datasources.remote.MovieApiResult
+import com.example.mymovies.data.datasources.remote.MovieApi
 import com.example.mymovies.framework.ui.main.MainViewModel
 import com.example.mymovies.usecases.LoadPopularMovies
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +36,7 @@ class ViewModelTest {
     lateinit var loadPopularMovies: LoadPopularMovies
 
     @Mock
-    lateinit var observer: Observer<List<MovieDb>>
+    lateinit var observer: Observer<List<MovieApi>>
     @Test
     fun `test every works`() {
         Assert.assertTrue(true)
@@ -62,7 +62,7 @@ class ViewModelTest {
         val apiKey = "143ff3f1cb015e7c03f8655b40163d46"
         val region = "US"
         val language = "en-US"
-        val fakeMovie = MovieDb(
+        val fakeMovie = MovieApi(
             adult = false,
             backdropPath = "/wSy4EZlZcbxyoLS5jQk5Vq3Az8.jpg",
             genreIds = listOf(878, 53),
@@ -80,7 +80,7 @@ class ViewModelTest {
         )
         val fakeList = listOf(fakeMovie)
         val fakeResult =
-            MovieDbResult(page = 1, results = fakeList, totalPages = 1, totalResults = 1)
+            MovieApiResult(page = 1, results = fakeList, totalPages = 1, totalResults = 1)
 
         whenever(
             loadPopularMovies.getPopularMovie(

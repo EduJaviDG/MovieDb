@@ -19,7 +19,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.mymovies.R
-import com.example.mymovies.data.datasources.MovieDb
 import com.example.mymovies.data.datasources.PermissionRequester
 import com.example.mymovies.databinding.ActivityMainBinding
 import com.example.mymovies.domain.Movie

@@ -1,9 +1,9 @@
-package com.example.mymovies.framework.data.datasources
+package com.example.mymovies.framework.data.datasources.remote
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class MovieDbClient() {
+class MovieRemoteClient() {
     companion object{
         private const val baseUrl = "https://api.themoviedb.org/3/movie/"
     }
@@ -13,5 +13,5 @@ class MovieDbClient() {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val service: MovieDbService = retrofit.create(MovieDbService::class.java)
+    val service: MovieRemoteService = retrofit.create(MovieRemoteService::class.java)
 }

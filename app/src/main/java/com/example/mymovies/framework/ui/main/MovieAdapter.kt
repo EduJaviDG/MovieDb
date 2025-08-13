@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mymovies.R
-import com.example.mymovies.data.datasources.MovieDb
 import com.example.mymovies.databinding.ItemMovieBinding
 import com.example.mymovies.domain.Movie
 
