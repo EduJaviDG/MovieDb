@@ -2,20 +2,10 @@ package com.example.mymovies
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.example.mymovies.data.datasources.remote.MovieApiResult
-import com.example.mymovies.data.datasources.remote.MovieApi
 import com.example.mymovies.domain.Movie
 import com.example.mymovies.framework.ui.main.MainViewModel
 import com.example.mymovies.usecases.LoadPopularMovies
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,7 +30,7 @@ class ViewModelTest {
     lateinit var observer: Observer<List<Movie>>
 
     @Test
-    fun `load popular movies`() = runBlocking {
+    fun `load popular movies from server`() = runBlocking {
         val apiKey = "143ff3f1cb015e7c03f8655b40163d46"
         val region = "US"
         val language = "en-US"
@@ -52,7 +42,7 @@ class ViewModelTest {
                 language = language,
                 region = region
             )
-        ).thenReturn(fakeList)
+        ).thenReturn(fakeDomainList)
 
         val vm = MainViewModel(loadPopularMovies)
 
@@ -63,8 +53,7 @@ class ViewModelTest {
         vm.region = region
         vm.getPopularMovies()
 
-        verify(observer).onChanged(fakeList)
+        verify(observer).onChanged(fakeDomainList)
     }
-
 
 }
