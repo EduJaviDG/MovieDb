@@ -1,9 +1,7 @@
 package com.example.mymovies
 
-import com.example.mymovies.data.datasources.local.MovieDb as ServerMovie
+import com.example.mymovies.data.datasources.local.MovieDb as DbMovie
 import com.example.mymovies.domain.Movie as DomainMovie
-
-
 
 val fakeDomainMovie = DomainMovie(
     adult = false,
@@ -22,7 +20,7 @@ val fakeDomainMovie = DomainMovie(
     voteCount = 207
 )
 
-val fakeServerMovie = ServerMovie(
+val fakeDbMovie = DbMovie(
     adult = false,
     backdropPath = "/wSy4EZlZcbxyoLS5jQk5Vq3Az8.jpg",
     genreIds = listOf("878", "53"),
@@ -41,4 +39,5 @@ val fakeServerMovie = ServerMovie(
 
 val fakeDomainList = listOf(fakeDomainMovie)
 
-val fakeServerList = listOf(fakeServerMovie)
+val fakeDbList = listOf(fakeDbMovie)
+
