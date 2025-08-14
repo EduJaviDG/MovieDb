@@ -7,6 +7,7 @@ interface LocalDataSource {
    suspend fun saveAllPopularMovies(movies: List<MovieDb>)
    suspend fun getAllPopularMovies(): List<Movie>
    suspend fun getPopularMovie(id: Int?): Movie
+   suspend fun size(): Int
 
 
 }

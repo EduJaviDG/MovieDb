@@ -7,7 +7,7 @@ import com.example.mymovies.domain.Movie as DomainMovie
 class MovieRemoteDataSource(
     private val client: MovieRemoteClient?
 ) : RemoteDataSource {
-    override suspend fun getPopularMovies(apikey: String?, language: String?, region: String?): List<DomainMovie>? {
+    override suspend fun getAllPopularMovies(apikey: String?, language: String?, region: String?): List<DomainMovie>? {
         val response = client?.service?.getPopularMoviesWithApiKey(
             apikey = apikey ?: "",
             language = language ?: "",

@@ -11,7 +11,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val loadPopularMovies: LoadPopularMovies) : ViewModel() {
+class MainViewModel @Inject constructor(private val loadPopularMovies: LoadPopularMovies) :
+    ViewModel() {
     var apikey: String? = null
     var language: String? = null
     var region: String? = null
@@ -19,13 +20,15 @@ class MainViewModel @Inject constructor(private val loadPopularMovies: LoadPopul
     private val _movies = MutableLiveData<List<Movie>>()
     val movies: LiveData<List<Movie>> get() = _movies
 
+
     fun getPopularMovies() {
         viewModelScope.launch {
-            _movies.value = loadPopularMovies.getPopularMovie(
+            _movies.value = loadPopularMovies.getPopularMovies(
                 apikey = apikey,
                 language = language,
                 region = region
             )
         }
     }
+
 }

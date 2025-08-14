@@ -18,6 +18,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.example.mymovies.R
 import com.example.mymovies.data.datasources.PermissionRequester
 import com.example.mymovies.databinding.ActivityMainBinding
@@ -27,9 +29,9 @@ import com.example.mymovies.util.openAppSettings
 import com.example.mymovies.util.toast
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
@@ -50,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var movieAdapter: MovieAdapter
+    private lateinit var mLayoutManager: LayoutManager
 
     private val viewModel by viewModels<MainViewModel>()
 
@@ -84,7 +87,6 @@ class MainActivity : AppCompatActivity() {
         setPermissions()
         initRecycle()
         refreshLayout()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -96,9 +98,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun initRecycle() {
         movieAdapter = MovieAdapter()
-        binding.rvPopularMovies.adapter = movieAdapter
+        mLayoutManager = GridLayoutManager(this, 3)
+
+        binding.rvPopularMovies.apply {
+            adapter = movieAdapter
+            layoutManager = mLayoutManager
+        }
 
         movieAdapter.setListener(movieListener)
+
     }
 
     private fun initClient() {
@@ -226,7 +234,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-
     }
 
     private fun showData(){

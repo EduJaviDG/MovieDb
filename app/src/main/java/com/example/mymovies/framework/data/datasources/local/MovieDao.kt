@@ -18,6 +18,8 @@ suspend fun findById(id: Int): MovieDb
 
 @Query("SELECT COUNT(*) FROM moviedb")
 suspend fun countMovies(): Int
+@Query("SELECT COUNT(*) FROM moviedb")
+suspend fun size(): Int
 
 @Insert(onConflict = OnConflictStrategy.REPLACE)
 suspend fun insertMovie(vararg movie: MovieDb)
