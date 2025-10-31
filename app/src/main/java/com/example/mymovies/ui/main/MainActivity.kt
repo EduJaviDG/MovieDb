@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
             viewModel.apikey = apiKey
             viewModel.region = getLocationClient()
             viewModel.language = getApiLanguage()
-            viewModel.getPopularMovies()
+            viewModel.getPopularMoviesWithApiKey()
 
             showPopularMovies()
         }

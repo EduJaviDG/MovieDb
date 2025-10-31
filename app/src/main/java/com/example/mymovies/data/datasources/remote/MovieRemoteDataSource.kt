@@ -5,10 +5,10 @@ import com.example.mymovies.data.mappers.toDomainMovie
 import com.example.mymovies.domain.model.Movie as DomainMovie
 
 class MovieRemoteDataSource(
-    private val client: MovieRemoteClient?
+    private val service: MovieRemoteService?
 ) : RemoteDataSource {
     override suspend fun getAllPopularMoviesWithApiKey(apikey: String?, language: String?, region: String?): List<DomainMovie>? {
-        val response = client?.service?.getPopularMoviesWithApiKey(
+        val response = service?.getPopularMoviesWithApiKey(
             apikey = apikey ?: "",
             language = language ?: "",
             region = region ?: ""
@@ -21,12 +21,12 @@ class MovieRemoteDataSource(
         return movies
     }
     override suspend fun getAllPopularMoviesWithAccessToken(
-        headers: Map<String, String>,
+        headers: Map<String, String>?,
         language: String?,
         region: String?
     ): List<Movie>? {
-        val response = client?.service?.getPopularMoviesWithAccessToken(
-            headers = headers,
+        val response = service?.getPopularMoviesWithAccessToken(
+            headers = headers ?: mapOf(),
             language = language ?: "",
             region = region ?: ""
             )

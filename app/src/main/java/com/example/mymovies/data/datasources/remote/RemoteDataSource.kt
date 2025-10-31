@@ -10,7 +10,7 @@ interface RemoteDataSource {
     ): List<Movie>?
 
     suspend fun getAllPopularMoviesWithAccessToken(
-        headers: Map<String, String>,
+        headers: Map<String, String>?,
         language: String?,
         region: String?
     ): List<Movie>?

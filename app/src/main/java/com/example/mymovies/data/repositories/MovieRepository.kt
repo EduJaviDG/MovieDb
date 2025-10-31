@@ -29,8 +29,8 @@ class MovieRepository @Inject constructor(
 
     }
 
-    suspend fun getPopularMoviesWithHeader(
-        headers: Map<String, String>,
+    suspend fun getPopularMoviesWithAccessToken(
+        headers: Map<String, String>?,
         language: String?,
         region: String?
     ): List<DomainMovie> {
