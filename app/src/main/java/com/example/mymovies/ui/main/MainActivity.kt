@@ -120,6 +120,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun callService() {
+        val headers = mapOf<String, String>(
+            "accept" to "application/json",
+            "Authorization" to accessToken
+        )
+
         lifecycleScope.launch {
             viewModel.apikey = apiKey
             viewModel.region = getLocationClient()
