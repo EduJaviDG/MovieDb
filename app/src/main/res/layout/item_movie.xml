@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.example.mymovies.framework.ui.common.AspectRatioImageView
+        <com.example.mymovies.ui.common.AspectRatioImageView
             android:id="@+id/iv_cover_movie"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

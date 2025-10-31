@@ -1,6 +1,7 @@
 package com.example.mymovies.data.datasources.local
 
-import com.example.mymovies.domain.Movie
+import com.example.mymovies.domain.model.Movie
+import com.example.mymovies.domain.model.MovieDb
 
 interface LocalDataSource {
    suspend fun isEmpty(): Boolean

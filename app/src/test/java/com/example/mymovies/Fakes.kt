@@ -1,7 +1,7 @@
 package com.example.mymovies
 
-import com.example.mymovies.data.datasources.local.MovieDb as DbMovie
-import com.example.mymovies.domain.Movie as DomainMovie
+import com.example.mymovies.domain.model.MovieDb as DbMovie
+import com.example.mymovies.domain.model.Movie as DomainMovie
 
 val fakeDomainMovie = DomainMovie(
     adult = false,

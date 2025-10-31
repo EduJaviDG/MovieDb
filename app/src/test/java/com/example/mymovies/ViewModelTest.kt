@@ -2,9 +2,9 @@ package com.example.mymovies
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.example.mymovies.domain.Movie
-import com.example.mymovies.framework.ui.main.MainViewModel
-import com.example.mymovies.usecases.LoadPopularMovies
+import com.example.mymovies.domain.model.Movie
+import com.example.mymovies.ui.main.MainViewModel
+import com.example.mymovies.domain.usecases.LoadPopularMovies
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test

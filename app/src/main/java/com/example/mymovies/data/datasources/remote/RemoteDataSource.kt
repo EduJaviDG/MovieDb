@@ -1,6 +1,6 @@
 package com.example.mymovies.data.datasources.remote
 
-import com.example.mymovies.domain.Movie
+import com.example.mymovies.domain.model.Movie
 
 interface RemoteDataSource {
     suspend fun getAllPopularMoviesWithApiKey(
