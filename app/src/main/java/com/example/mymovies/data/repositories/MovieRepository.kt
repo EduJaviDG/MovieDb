@@ -10,13 +10,13 @@ class MovieRepository @Inject constructor(
     private val movieRemoteDataSource: MovieRemoteDataSource,
     private val movieLocalDataSource: MovieLocalDataSource
 ) {
-    suspend fun getPopularMovies(
+    suspend fun getPopularMoviesWithApiKey(
         apikey: String?,
         language: String?,
         region: String?
     ): List<DomainMovie> {
         if (movieLocalDataSource.isEmpty()) {
-            val movies = movieRemoteDataSource.getAllPopularMovies(
+            val movies = movieRemoteDataSource.getAllPopularMoviesWithApiKey(
                 apikey = apikey ?: "",
                 language = language ?: "",
                 region = region ?: ""
@@ -27,6 +27,23 @@ class MovieRepository @Inject constructor(
 
         return movieLocalDataSource.getAllPopularMovies()
 
+    }
+
+    suspend fun getPopularMoviesWithHeader(
+        headers: Map<String, String>,
+        language: String?,
+        region: String?
+    ): List<DomainMovie> {
+        if (movieLocalDataSource.isEmpty()) {
+            val movies = movieRemoteDataSource.getAllPopularMoviesWithAccessToken(
+               headers = headers,
+                language = language ?: "",
+                region = region ?: "")
+            val dbMovies = movies?.map{ it.toDbMovie() }
+            movieLocalDataSource.saveAllPopularMovies(dbMovies ?: emptyList())
+        }
+
+        return movieLocalDataSource.getAllPopularMovies()
     }
 
 }

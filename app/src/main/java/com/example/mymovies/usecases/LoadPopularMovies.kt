@@ -4,6 +4,9 @@ import com.example.mymovies.data.repositories.MovieRepository
 
 class LoadPopularMovies(private val repository: MovieRepository) {
     suspend fun getPopularMovies(apikey: String?, language: String?, region: String?) =
-        repository.getPopularMovies(apikey = apikey, language = language, region = region)
+        repository.getPopularMoviesWithApiKey(
+            apikey = apikey,
+            language = language,
+            region = region)
 
 }

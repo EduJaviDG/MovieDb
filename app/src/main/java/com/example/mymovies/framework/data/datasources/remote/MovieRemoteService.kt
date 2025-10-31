@@ -15,5 +15,9 @@ interface MovieRemoteService {
     ): MovieApiResult
 
     @GET("popular")
-    suspend fun getPopularMoviesWithAccessToken(@HeaderMap headers: Map<String, String>): MovieApiResult
+    suspend fun getPopularMoviesWithAccessToken(
+        @Query("language") language: String,
+        @Query("region") region: String,
+        @HeaderMap headers: Map<String, String>,
+        ): MovieApiResult
 }

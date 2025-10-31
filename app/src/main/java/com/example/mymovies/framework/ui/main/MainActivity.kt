@@ -119,7 +119,6 @@ class MainActivity : AppCompatActivity() {
             updateLayout()
         }
     }
-
     private fun callService() {
         lifecycleScope.launch {
             viewModel.apikey = apiKey
@@ -152,14 +151,14 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 fusedLocationClient.getCurrentLocation(
-                    LocationRequest.PRIORITY_HIGH_ACCURACY,
+                    LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY,
                     cancellationToken
                 )
                     .addOnCompleteListener { currentLocation ->
                         if (currentLocation.result == null) {
                             val locationRequest = LocationRequest()
                                 .setInterval(60000L)
-                                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
 
                             val locationCallBack = object : LocationCallback() {
                                 override fun onLocationResult(p0: LocationResult?) {
