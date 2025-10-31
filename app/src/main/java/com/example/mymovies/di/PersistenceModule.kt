@@ -5,8 +5,6 @@ import androidx.room.Room
 import com.example.mymovies.data.datasources.local.AppDataBase
 import com.example.mymovies.data.datasources.local.MovieDao
 import com.example.mymovies.data.datasources.local.MovieLocalDataSource
-import com.example.mymovies.data.datasources.remote.MovieRemoteClient
-import com.example.mymovies.data.datasources.remote.MovieRemoteDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,15 +14,8 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class FrameworkModule {
-    @Provides
-    fun movieDbClientProvider(): MovieRemoteClient = MovieRemoteClient()
+object PersistenceModule {
 
-    @Provides
-    fun movieRemoteDataSourceProvider(movieRemoteClient: MovieRemoteClient): MovieRemoteDataSource =
-        MovieRemoteDataSource(
-            movieRemoteClient
-        )
     @Singleton
     @Provides
     fun provideAppDataBase(@ApplicationContext app: Context) =
@@ -34,12 +25,14 @@ class FrameworkModule {
             "database-name"
         )
             .build()
+
     @Singleton
     @Provides
     fun provideMovieDao(db: AppDataBase) =
         db.movieDao()
+
+    @Singleton
     @Provides
     fun movieLocalDataSourceProvider(dao: MovieDao): MovieLocalDataSource =
         MovieLocalDataSource(dao)
-
 }
