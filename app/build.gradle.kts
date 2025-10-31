@@ -1,3 +1,6 @@
+val API_KEY: String by project
+val ACCESS_TOKEN: String by project
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -18,6 +21,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "API_KEY", API_KEY)
+        buildConfigField("String", "ACCESS_TOKEN", ACCESS_TOKEN)
+    }
+    buildFeatures{
+        buildConfig = true
     }
 
     buildFeatures{

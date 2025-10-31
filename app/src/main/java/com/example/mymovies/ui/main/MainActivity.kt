@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
+import com.example.mymovies.BuildConfig
 import com.example.mymovies.R
 import com.example.mymovies.data.location.PermissionRequester
 import com.example.mymovies.databinding.ActivityMainBinding
@@ -56,8 +57,8 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<MainViewModel>()
 
-    private val apiKey: String by lazy { getString(R.string.api_key) }
-    private val accessToken: String by lazy { getString(R.string.access_token) }
+    private val apiKey = BuildConfig.API_KEY
+    private val accessToken = BuildConfig.ACCESS_TOKEN
 
     private val coarsePermission: PermissionRequester =
         PermissionRequester(this, Manifest.permission.ACCESS_COARSE_LOCATION)
