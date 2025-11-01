@@ -1,4 +1,4 @@
-package com.example.mymovies.data.location
+package com.example.mymovies.util
 
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
