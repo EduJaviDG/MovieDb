@@ -10,10 +10,13 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -61,6 +64,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var movieAdapter: MovieAdapter
     private lateinit var mLayoutManager: LayoutManager
 
+    private var movies = listOf<Movie>()
+
     private val viewModel by viewModels<MainViewModel>()
 
     private val apiKey = BuildConfig.API_KEY
@@ -69,9 +74,9 @@ class MainActivity : AppCompatActivity() {
     private val coarsePermission: PermissionRequester =
         PermissionRequester(this, Manifest.permission.ACCESS_COARSE_LOCATION)
 
-    private val granted: () -> Unit = { callService() }
+    private val granted: () -> Unit = { callServiceWithPermissions() }
     private val rationale: () -> Unit = { showDialog() }
-    private val denied: () -> Unit = { toast(getString(R.string.message_toast)) }
+    private val denied: () -> Unit = { toast(getString(R.string.message_toast))}
 
     private val movieListener = object : MovieClickListener {
         override fun onClickMovie(item: Movie?) {
@@ -83,6 +88,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initClient()
+        callServiceWithoutPermissions()
         setPermissions()
         initRecycle()
         refreshLayout()
@@ -119,7 +125,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun callService() {
+    private fun callServiceWithPermissions() {
         val headers = mapOf<String, String>(
             "accept" to "application/json",
             "Authorization" to accessToken
@@ -130,6 +136,23 @@ class MainActivity : AppCompatActivity() {
 
             viewModel.apikey = apiKey
             viewModel.region = getRegionFromLocation(location)
+            viewModel.language = getApiLanguage()
+            viewModel.getPopularMoviesWithApiKey()
+
+            showPopularMovies()
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun callServiceWithoutPermissions() {
+        val headers = mapOf<String, String>(
+            "accept" to "application/json",
+            "Authorization" to accessToken
+        )
+
+        lifecycleScope.launch {
+            viewModel.apikey = apiKey
+            viewModel.region = DEFAULT_REGION
             viewModel.language = getApiLanguage()
             viewModel.getPopularMoviesWithApiKey()
 
@@ -183,7 +206,6 @@ class MainActivity : AppCompatActivity() {
 
         return apiLanguage
     }
-
     private fun showPopularMovies() {
         viewModel.movies.observe(this@MainActivity){ popularMovies ->
             if (popularMovies != null) {
@@ -192,8 +214,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Log.d("MainActivity", LOADING_DATA_ERROR)
             }
-
         }
+
     }
 
     private fun showData(){
@@ -234,11 +256,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun showSnackBar() {
         Snackbar.make(binding.root, R.string.message_snack, Snackbar.LENGTH_LONG)
-            .setAction(R.string.title_action_snack, { actionClick() })
+            .setAction(R.string.title_action_snack) { actionClick() }
             .setActionTextColor(getColor(R.color.dark_pink))
             .show()
     }
-
     private fun actionClick() {}
 
 }

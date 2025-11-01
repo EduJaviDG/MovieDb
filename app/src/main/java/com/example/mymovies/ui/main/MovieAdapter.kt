@@ -2,20 +2,22 @@ package com.example.mymovies.ui.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mymovies.R
 import com.example.mymovies.databinding.ItemMovieBinding
 import com.example.mymovies.domain.model.Movie
+import com.example.mymovies.util.DiffUtilItemCallBack
 
 class MovieAdapter(): RecyclerView.Adapter<MovieAdapter.ViewHolder>() {
+    private val differItemCallBack = DiffUtilItemCallBack()
+    private val differ = AsyncListDiffer(this, differItemCallBack)
     private var movieList: List<Movie>? = null
     private var movieListener: MovieClickListener? = null
 
     fun setListOfMovies(list: List<Movie>?){
-        movieList = list
-
-        notifyItemRangeInserted(0, movieList?.size ?: 0)
+        differ.submitList(list)
     }
 
     fun setListener(listener: MovieClickListener){
@@ -31,10 +33,10 @@ class MovieAdapter(): RecyclerView.Adapter<MovieAdapter.ViewHolder>() {
         return ViewHolder(binding)
     }
 
-    override fun getItemCount() = movieList?.size ?: 0
+    override fun getItemCount() = differ.currentList.size ?: 0
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = movieList?.get(position)
+        val item = differ.currentList[position]
 
         holder.bind(item, movieListener)
     }
