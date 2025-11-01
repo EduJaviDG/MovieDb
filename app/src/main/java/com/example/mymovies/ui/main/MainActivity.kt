@@ -74,10 +74,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        const val TAG ="MainActivity"
         const val DEFAULT_API_LANGUAGE = "en-US"
         const val DEFAULT_REGION = "US"
         const val SPANISH_LANGUAGE = "es"
         const val ENGLISH_LANGUAGE = "en"
+        const val DEFAULT_LATITUDE = 40.6551454
+        const val DEFAULT_LONGITUDE = -4.004325
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -212,7 +215,8 @@ class MainActivity : AppCompatActivity() {
                 1
             )
         }
-
+        Log.i(TAG, "location: $location")
+        Log.i(TAG, "country: ${result?.get(0)?.countryCode}")
         return result?.get(0)?.countryCode
 
     }
