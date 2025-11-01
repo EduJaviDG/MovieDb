@@ -178,7 +178,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         return DEFAULT_REGION
-
     }
 
     private fun getApiLanguage(): String {
