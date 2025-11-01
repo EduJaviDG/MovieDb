@@ -64,8 +64,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var movieAdapter: MovieAdapter
     private lateinit var mLayoutManager: LayoutManager
 
-    private var movies = listOf<Movie>()
-
     private val viewModel by viewModels<MainViewModel>()
 
     private val apiKey = BuildConfig.API_KEY
