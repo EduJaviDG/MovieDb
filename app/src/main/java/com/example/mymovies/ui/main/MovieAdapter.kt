@@ -13,7 +13,6 @@ import com.example.mymovies.util.DiffUtilItemCallBack
 class MovieAdapter(): RecyclerView.Adapter<MovieAdapter.ViewHolder>() {
     private val differItemCallBack = DiffUtilItemCallBack()
     private val differ = AsyncListDiffer(this, differItemCallBack)
-    private var movieList: List<Movie>? = null
     private var movieListener: MovieClickListener? = null
 
     fun setListOfMovies(list: List<Movie>?){
