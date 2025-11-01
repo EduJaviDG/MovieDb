@@ -22,10 +22,15 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.example.mymovies.BuildConfig
 import com.example.mymovies.R
+import com.example.mymovies.data.location.DefaultLocationTracker
 import com.example.mymovies.data.location.PermissionRequester
 import com.example.mymovies.databinding.ActivityMainBinding
 import com.example.mymovies.domain.model.Movie
 import com.example.mymovies.ui.detail.DetailActivity
+import com.example.mymovies.util.Constants.Companion.DEFAULT_API_LANGUAGE
+import com.example.mymovies.util.Constants.Companion.DEFAULT_REGION
+import com.example.mymovies.util.Constants.Companion.LOADING_DATA_ERROR
+import com.example.mymovies.util.Constants.Companion.SPANISH_LANGUAGE
 import com.example.mymovies.util.openAppSettings
 import com.example.mymovies.util.toast
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -40,14 +45,23 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import java.util.Locale
+import javax.inject.Inject
 import kotlin.coroutines.resume
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    companion object {
+        const val TAG ="MainActivity"
+    }
+
+    @Inject
+    lateinit var defaultLocationTracker: DefaultLocationTracker
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -72,17 +86,6 @@ class MainActivity : AppCompatActivity() {
             navigateToDetailActivity(item)
         }
     }
-
-    companion object {
-        const val TAG ="MainActivity"
-        const val DEFAULT_API_LANGUAGE = "en-US"
-        const val DEFAULT_REGION = "US"
-        const val SPANISH_LANGUAGE = "es"
-        const val ENGLISH_LANGUAGE = "en"
-        const val DEFAULT_LATITUDE = 40.6551454
-        const val DEFAULT_LONGITUDE = -4.004325
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -123,6 +126,7 @@ class MainActivity : AppCompatActivity() {
             updateLayout()
         }
     }
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun callService() {
         val headers = mapOf<String, String>(
             "accept" to "application/json",
@@ -130,8 +134,10 @@ class MainActivity : AppCompatActivity() {
         )
 
         lifecycleScope.launch {
+            val location = defaultLocationTracker.getCurrentLocation()
+
             viewModel.apikey = apiKey
-            viewModel.region = getLocationClient()
+            viewModel.region = getRegionFromLocation(location)
             viewModel.language = getApiLanguage()
             viewModel.getPopularMoviesWithApiKey()
 
@@ -143,81 +149,35 @@ class MainActivity : AppCompatActivity() {
         coarsePermission.runWithPermission()
 
     }
-
-    @SuppressLint("MissingPermission")
-    private suspend fun getLocationClient(): String? = suspendCancellableCoroutine { continuation ->
-        fusedLocationClient.lastLocation.addOnCompleteListener { lastLocation ->
-            if (lastLocation.result == null) {
-                val cancellationToken = object : CancellationToken() {
-                    override fun isCancellationRequested(): Boolean {
-                        return false
-                    }
-
-                    override fun onCanceledRequested(p0: OnTokenCanceledListener): CancellationToken {
-                        return CancellationTokenSource().token
-                    }
-
-                }
-
-                fusedLocationClient.getCurrentLocation(
-                    LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY,
-                    cancellationToken
-                )
-                    .addOnCompleteListener { currentLocation ->
-                        if (currentLocation.result == null) {
-                            val locationRequest = LocationRequest()
-                                .setInterval(60000L)
-                                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
-
-                            val locationCallBack = object : LocationCallback() {
-                                override fun onLocationResult(p0: LocationResult?) {
-                                    super.onLocationResult(p0)
-                                    val locations = p0?.locations
-
-                                    if (locations != null) {
-                                        continuation.resume(getRegionFromLocation(locations[0]))
-                                    }
-                                }
-                            }
-
-                            fusedLocationClient.requestLocationUpdates(
-                                locationRequest,
-                                locationCallBack,
-                                null
-                            )
-
-                        } else {
-                            continuation.resume(getRegionFromLocation(currentLocation.result))
-                        }
-                    }
-
-            } else {
-                continuation.resume(getRegionFromLocation(lastLocation.result))
-            }
-        }
-    }
-
-    private fun getRegionFromLocation(location: Location): String? {
+    private suspend fun getRegionFromLocation(location: Location?): String? {
         val geocoder = Geocoder(this)
         var result: List<Address>? = listOf()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            geocoder.getFromLocation(
-                location.latitude,
-                location.longitude,
-                1
-            ) { addresses ->
-                result = addresses
+
+        withContext(Dispatchers.IO){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                geocoder.getFromLocation(
+                    location?.latitude ?: 0.0,
+                    location?.longitude ?: 0.0,
+                    1
+                ) { addresses ->
+                    result = addresses
+                }
+            } else {
+                result = geocoder.getFromLocation(
+                    location?.latitude ?: 0.0,
+                    location?.longitude ?: 0.0,
+                    1
+                )
             }
-        } else {
-            result = geocoder.getFromLocation(
-                location.latitude,
-                location.longitude,
-                1
-            )
         }
-        Log.i(TAG, "location: $location")
-        Log.i(TAG, "country: ${result?.get(0)?.countryCode}")
-        return result?.get(0)?.countryCode
+
+        Log.i(TAG, "location: ${location?.latitude} latitude, ${location?.longitude} longitude")
+
+        if(result?.isNotEmpty() == true){
+            return result?.get(0)?.countryCode
+        }
+
+        return DEFAULT_REGION
 
     }
 
@@ -239,7 +199,7 @@ class MainActivity : AppCompatActivity() {
                 movieAdapter.setListOfMovies(popularMovies)
                 showData()
             } else {
-                Log.d("MainActivity", "ERROR LOADING DATA")
+                Log.d("MainActivity", LOADING_DATA_ERROR)
             }
 
         }
