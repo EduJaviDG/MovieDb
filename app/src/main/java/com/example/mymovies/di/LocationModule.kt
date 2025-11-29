@@ -1,6 +1,7 @@
 package com.example.mymovies.di
 
 import android.app.Application
+import android.content.Context
 import com.example.mymovies.data.location.DefaultLocationTracker
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -27,7 +28,8 @@ object LocationModule {
     @Provides
     fun provideLocationTracker(
         fusedLocationProviderClient: FusedLocationProviderClient,
-        app: Application): DefaultLocationTracker =
-        DefaultLocationTracker(fusedLocationProviderClient, app)
+        @ApplicationContext context: Context
+    ): DefaultLocationTracker =
+        DefaultLocationTracker(fusedLocationProviderClient, context)
 
 }

@@ -2,15 +2,17 @@ package com.example.mymovies.util
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.view.Gravity
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.text.bold
 
 inline fun Context.toast(message: CharSequence) =
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 
 
 inline fun Context.openAppSettings() {
@@ -27,3 +29,9 @@ inline fun SpannableStringBuilder.appendInfo(context: Context, stringRes: Int, v
         appendLine(value)
     }
 }
+
+inline fun Context.hasPermission(permission: String): Boolean =
+    ContextCompat.checkSelfPermission(
+        this,
+        permission
+    ) == PackageManager.PERMISSION_GRANTED
