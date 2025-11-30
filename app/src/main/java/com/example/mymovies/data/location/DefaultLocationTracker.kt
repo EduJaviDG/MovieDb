@@ -10,6 +10,7 @@ import com.example.mymovies.util.Constants.Companion.LAST_LOCATION_ERROR
 import com.example.mymovies.util.hasPermission
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
@@ -20,13 +21,8 @@ import okio.IOException
 
 class DefaultLocationTracker(
     private val locationClient: FusedLocationProviderClient,
-    context: Context
+    private val context: Context
 ) : LocationTracker {
-
-    private val hasAccessCoarseLocationPermission =
-        context.hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-    private val hasAccessFineLocation =
-        context.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)
 
     private val cancellationToken = object : CancellationToken() {
         override fun isCancellationRequested(): Boolean {
@@ -44,10 +40,12 @@ class DefaultLocationTracker(
 
     private val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
+    @ExperimentalCoroutinesApi
     @SuppressLint("MissingPermission")
     override suspend fun getCurrentLocation(): Location? {
-        if (!hasAccessCoarseLocationPermission || !hasAccessFineLocation
-            || !isGpsEnabled
+        if (!context.hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ||
+            !context.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION) ||
+            !isGpsEnabled
         ) {
             return null
         }
@@ -58,29 +56,32 @@ class DefaultLocationTracker(
             ).apply {
                 if (isComplete) {
                     if (isSuccessful) {
-                        continuation.resume(result, throw IOException(CURRENT_LOCATION_ERROR))
+                        continuation.resume(result, null)
                     } else {
-                        continuation.resume(null, throw IOException(CURRENT_LOCATION_ERROR))
+                        throw IOException(CURRENT_LOCATION_ERROR)
                     }
                     return@suspendCancellableCoroutine
                 }
                 addOnSuccessListener { currentLocation ->
                     continuation.resume(currentLocation, null)
                 }
-                addOnFailureListener { e ->
-                    continuation.resume(null, throw e)
+                addOnFailureListener { exception ->
+                    throw exception
                 }
                 addOnCanceledListener {
-                    continuation.cancel(throw IOException(CURRENT_LOCATION_ERROR))
+                    continuation.cancel()
                 }
             }
         }
     }
 
+
+    @ExperimentalCoroutinesApi
     @SuppressLint("MissingPermission")
     override suspend fun getLastLocation(): Location? {
-        if (!hasAccessCoarseLocationPermission || !hasAccessFineLocation
-            || !isGpsEnabled
+        if (!context.hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION) ||
+            !context.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION) ||
+            !isGpsEnabled
         ) {
             return null
         }
@@ -91,18 +92,18 @@ class DefaultLocationTracker(
                     if (isSuccessful) {
                         continuation.resume(result, null)
                     } else {
-                        continuation.resume(null, throw IOException(LAST_LOCATION_ERROR))
+                        throw IOException(LAST_LOCATION_ERROR)
                     }
                     return@suspendCancellableCoroutine
                 }
-                addOnSuccessListener { currentLocation ->
-                    continuation.resume(currentLocation, null)
+                addOnSuccessListener { lastLocation ->
+                    continuation.resume(lastLocation, null)
                 }
-                addOnFailureListener { e ->
-                    continuation.resume(null, throw e)
+                addOnFailureListener { exception ->
+                    throw exception
                 }
                 addOnCanceledListener {
-                    continuation.cancel(throw IOException(LAST_LOCATION_ERROR))
+                    continuation.cancel()
                 }
             }
         }

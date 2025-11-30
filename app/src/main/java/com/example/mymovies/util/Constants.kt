@@ -4,8 +4,6 @@ class Constants {
     companion object{
         const val BASE_URL = "https://api.themoviedb.org/3/movie/"
         const val DEFAULT_API_REGION = "US"
-        const val DEFAULT_LATITUDE = 37.7749
-        const val DEFAULT_LONGITUDE = 122.419
         const val GRANTED = "granted"
         const val DENIED = "denied"
         const val PERMANENTLY_DENIED = "permanently denied"

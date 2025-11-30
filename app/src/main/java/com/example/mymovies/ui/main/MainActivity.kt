@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
+import com.edu.running.utils.MockLocationProvider
 import com.example.mymovies.BuildConfig
 import com.example.mymovies.R
 import com.example.mymovies.data.location.DefaultLocationTracker
@@ -27,8 +28,6 @@ import com.example.mymovies.databinding.ActivityMainBinding
 import com.example.mymovies.domain.model.Movie
 import com.example.mymovies.ui.detail.DetailActivity
 import com.example.mymovies.util.Constants.Companion.DEFAULT_API_REGION
-import com.example.mymovies.util.Constants.Companion.DEFAULT_LATITUDE
-import com.example.mymovies.util.Constants.Companion.DEFAULT_LONGITUDE
 import com.example.mymovies.util.Constants.Companion.DENIED
 import com.example.mymovies.util.Constants.Companion.GRANTED
 import com.example.mymovies.util.Constants.Companion.LOADING_DATA_ERROR
@@ -39,14 +38,19 @@ import com.example.mymovies.util.toast
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -55,6 +59,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var defaultLocationTracker: DefaultLocationTracker
+
+    @Inject
+    lateinit var mockLocationProvider: MockLocationProvider
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -137,12 +144,19 @@ class MainActivity : AppCompatActivity() {
     private fun initClient() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         locationRequest = LocationRequest()
+
     }
 
     private fun refreshLayout() {
         binding.swRefresh.setOnRefreshListener {
             updateLayout()
         }
+    }
+
+    private fun provideMockLocation() {
+        mockLocationProvider.enableProvider()
+        //Helsinki
+        mockLocationProvider.pushLocation(lat = 60.192059, lon = 24.945831)
     }
 
     private fun callService(defaultRegion: String? = null) {
@@ -162,9 +176,8 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             lifecycleScope.launch {
-                val location =
-                    defaultLocationTracker.getLastLocation()
-                        ?: defaultLocationTracker.getCurrentLocation()
+                val location = defaultLocationTracker.getLastLocation()
+                    ?: defaultLocationTracker.getCurrentLocation()
 
                 viewModel.apikey = apiKey
                 viewModel.region = getRegionFromLocation(location)
@@ -207,6 +220,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             Manifest.permission.ACCESS_FINE_LOCATION -> {
+                provideMockLocation()
                 callService()
             }
         }
@@ -225,25 +239,28 @@ class MainActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 geocoder.getFromLocation(
-                    location?.latitude ?: DEFAULT_LATITUDE,
-                    location?.longitude ?: DEFAULT_LONGITUDE,
+                    location?.latitude ?: 0.0,
+                    location?.longitude ?: 0.0,
                     1
                 ) { addresses ->
                     result = addresses
                 }
             } else {
                 result = geocoder.getFromLocation(
-                    location?.latitude ?: DEFAULT_LATITUDE,
-                    location?.longitude ?: DEFAULT_LONGITUDE,
+                    location?.latitude ?: 0.0,
+                    location?.longitude ?: 0.0,
                     1
                 )
             }
         }
 
-        Log.i(TAG, "location: ${location?.latitude} latitude, ${location?.longitude} longitude")
+        Log.d(TAG, "location: ${location?.latitude} latitude, ${location?.longitude} longitude")
 
         if (result?.isNotEmpty() == true) {
-            return result?.get(0)?.countryCode
+            val region = result?.get(0)?.countryCode
+            Log.d(TAG, "region: $region")
+
+            return region
         }
 
         return DEFAULT_API_REGION
