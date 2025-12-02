@@ -5,9 +5,10 @@ import javax.inject.Inject
 
 class GetPopularMoviesWithApiKeyUseCase @Inject constructor(private val repository: MovieRepository) {
 
-    suspend operator fun invoke(apikey: String?, language: String?, region: String?) =
+    suspend operator fun invoke(apikey: String?, language: String?, region: String?, page: Int?) =
         repository.getPopularMoviesWithApiKey(
             apikey = apikey,
             language = language,
-            region = region)
+            region = region,
+            page = page)
 }

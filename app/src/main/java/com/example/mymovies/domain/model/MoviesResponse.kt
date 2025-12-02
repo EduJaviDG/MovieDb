@@ -2,11 +2,11 @@ package com.example.mymovies.domain.model
 
 import com.google.gson.annotations.SerializedName
 
-data class MovieApiResult(
+data class MoviesResponse(
     @SerializedName("page")
-    val page: Int?,
+    var page: Int?,
     @SerializedName("results")
-    val results: List<MovieApi>?,
+    var movies: List<MovieApi>?,
     @SerializedName("total_pages")
     val totalPages: Int?,
     @SerializedName("total_results")

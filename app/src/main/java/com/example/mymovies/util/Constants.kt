@@ -10,5 +10,7 @@ class Constants {
         const val CURRENT_LOCATION_ERROR = "The current location is not available"
         const val LAST_LOCATION_ERROR = "The last location is not available"
         const val LOADING_DATA_ERROR = "Error loading data"
+        const val PAGE_SIZE = 20
+        const val INITIAL_PAGE = 1
     }
 }

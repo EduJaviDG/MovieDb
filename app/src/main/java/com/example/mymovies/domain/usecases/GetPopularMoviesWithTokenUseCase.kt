@@ -5,9 +5,14 @@ import javax.inject.Inject
 
 class GetPopularMoviesWithTokenUseCase @Inject constructor(private val repository: MovieRepository) {
 
-    suspend operator fun invoke(headers: Map<String, String>?, language: String?, region: String?) =
+    suspend operator fun invoke(
+        headers: Map<String, String>?,
+        language: String?,
+        region: String?,
+        page: Int?) =
         repository.getPopularMoviesWithAccessToken(
             headers = headers,
             language = language,
-            region = region)
+            region = region,
+            page = page)
 }

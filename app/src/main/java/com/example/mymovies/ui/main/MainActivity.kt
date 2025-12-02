@@ -11,36 +11,40 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.Menu
+import android.view.View
 import android.view.View.GONE
+import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
+import android.widget.AbsListView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.edu.running.utils.MockLocationProvider
 import com.example.mymovies.BuildConfig
 import com.example.mymovies.R
 import com.example.mymovies.data.location.DefaultLocationTracker
+import com.example.mymovies.data.mappers.toDomainMovie
 import com.example.mymovies.databinding.ActivityMainBinding
 import com.example.mymovies.domain.model.Movie
 import com.example.mymovies.ui.detail.DetailActivity
 import com.example.mymovies.util.Constants.Companion.DEFAULT_API_REGION
 import com.example.mymovies.util.Constants.Companion.DENIED
 import com.example.mymovies.util.Constants.Companion.GRANTED
-import com.example.mymovies.util.Constants.Companion.LOADING_DATA_ERROR
+import com.example.mymovies.util.Constants.Companion.INITIAL_PAGE
+import com.example.mymovies.util.Constants.Companion.PAGE_SIZE
 import com.example.mymovies.util.Constants.Companion.PERMANENTLY_DENIED
+import com.example.mymovies.util.Resource
 import com.example.mymovies.util.hasPermission
 import com.example.mymovies.util.openAppSettings
 import com.example.mymovies.util.toast
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.CancellationToken
-import com.google.android.gms.tasks.CancellationTokenSource
-import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +74,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mLayoutManager: LayoutManager
 
     private val viewModel by viewModels<MainViewModel>()
+
+    private var isLoading: Boolean = false
+    private var isLastPage: Boolean = false
+    private var isScrolling: Boolean = false
+
+    private var totalMovies: Int? = null
+    private var currentPage: Int? = null
 
     private val apiKey = BuildConfig.API_KEY
     private val accessToken = BuildConfig.ACCESS_TOKEN
@@ -108,6 +119,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val scrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+            if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                isScrolling = true
+            }
+        }
+
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            val lastVisibleItemPosition =
+                (mLayoutManager as GridLayoutManager).findLastVisibleItemPosition() + 1
+            val totalItemCount =
+                (mLayoutManager as GridLayoutManager).itemCount
+
+            if (shouldPaginate(lastVisibleItemPosition, totalItemCount)) {
+                callService()
+                isScrolling = false
+            }
+
+        }
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -135,6 +171,7 @@ class MainActivity : AppCompatActivity() {
         binding.rvPopularMovies.apply {
             adapter = movieAdapter
             layoutManager = mLayoutManager
+            addOnScrollListener(scrollListener)
         }
 
         movieAdapter.setListener(movieListener)
@@ -269,22 +306,61 @@ class MainActivity : AppCompatActivity() {
     private fun getApiLanguage() = Locale.getDefault().language.lowercase()
 
     private fun showPopularMovies() {
-        viewModel.movies.observe(this@MainActivity) { popularMovies ->
-            if (popularMovies != null) {
-                movieAdapter.setListOfMovies(popularMovies)
-                showData()
-            } else {
-                Log.d("MainActivity", LOADING_DATA_ERROR)
+        viewModel.popularMovies.observe(this@MainActivity) { response ->
+            when (response) {
+                is Resource.Error -> {
+                    Log.d(TAG, response.message.toString())
+                }
+
+                is Resource.Loading -> {
+                    if (currentPage != null) {
+                        showLoading()
+                    } else {
+                        isLoading = true
+                    }
+                }
+
+                is Resource.Success -> {
+                    if (currentPage != null) {
+                        hideLoading()
+                    } else {
+                        hideShimmer()
+                    }
+
+                    response.data?.let { data ->
+                        val movies = data.movies?.map { it.toDomainMovie() }
+                        movieAdapter.setListOfMovies(movies)
+
+                        totalMovies = movies?.size
+                        currentPage = data.page
+                        isLastPage = checkLastPage(data.totalPages)
+
+                    }
+                }
             }
         }
+    }
+
+    private fun showLoading() {
+        binding.pbPagination.visibility = VISIBLE
+        isLoading = true
 
     }
 
-    private fun showData() {
+    private fun hideLoading() {
+        binding.pbPagination.visibility = INVISIBLE
+        isLoading = false
+
+    }
+
+    private fun hideShimmer() {
+        isLoading = false
+
         Handler(Looper.getMainLooper()).postDelayed({
             binding.shlLoading.visibility = GONE
             binding.rvPopularMovies.visibility = VISIBLE
         }, 4000)
+
     }
 
     private fun updateLayout() {
@@ -310,6 +386,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun actionClick() = callService(DEFAULT_API_REGION)
+
+    private fun shouldPaginate(
+        lastVisibleItemPosition: Int,
+        totalItemCount: Int
+    ): Boolean {
+        val isNotLoadingAndNotLastPage = !isLoading && !isLastPage
+        val isAtLastItem = lastVisibleItemPosition == totalItemCount
+        val isTotalMoreThanVisible = totalItemCount >= (totalMovies ?: 0)
+
+        return isNotLoadingAndNotLastPage && isAtLastItem && isTotalMoreThanVisible && isScrolling
+    }
+
+    private fun checkLastPage(pages: Int?): Boolean {
+        val totalPages = (pages ?: 0) / PAGE_SIZE + 2
+
+        return viewModel.page == totalPages
+    }
 
     private fun navigateToDetailActivity(movie: Movie?) {
         val intent = Intent(this, DetailActivity::class.java)
