@@ -38,6 +38,7 @@ import com.example.mymovies.util.Constants.Companion.GRANTED
 import com.example.mymovies.util.Constants.Companion.INITIAL_PAGE
 import com.example.mymovies.util.Constants.Companion.PAGE_SIZE
 import com.example.mymovies.util.Constants.Companion.PERMANENTLY_DENIED
+import com.example.mymovies.util.PaginationScrollListener
 import com.example.mymovies.util.Resource
 import com.example.mymovies.util.hasPermission
 import com.example.mymovies.util.openAppSettings
@@ -77,7 +78,7 @@ class MainActivity : AppCompatActivity() {
 
     private var isLoading: Boolean = false
     private var isLastPage: Boolean = false
-    private var isScrolling: Boolean = false
+    //private var isScrolling: Boolean = false
 
     private var totalMovies: Int? = null
     private var currentPage: Int? = null
@@ -119,7 +120,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val scrollListener = object : RecyclerView.OnScrollListener() {
+    /*private val scrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
@@ -142,7 +143,7 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-    }
+    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,7 +172,26 @@ class MainActivity : AppCompatActivity() {
         binding.rvPopularMovies.apply {
             adapter = movieAdapter
             layoutManager = mLayoutManager
-            addOnScrollListener(scrollListener)
+            addOnScrollListener(object: PaginationScrollListener(
+                gridLayoutManager = mLayoutManager as GridLayoutManager
+            ){
+                override fun isLoading(): Boolean {
+                    return isLoading
+                }
+
+                override fun isLastPage(): Boolean {
+                    return isLastPage
+                }
+
+                override fun totalItems(): Int? {
+                    return  totalMovies
+                }
+
+                override fun loadMoreItems() {
+                    callService()
+                }
+
+            })
         }
 
         movieAdapter.setListener(movieListener)
@@ -387,7 +407,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun actionClick() = callService(DEFAULT_API_REGION)
 
-    private fun shouldPaginate(
+    /*private fun shouldPaginate(
         lastVisibleItemPosition: Int,
         totalItemCount: Int
     ): Boolean {
@@ -396,7 +416,7 @@ class MainActivity : AppCompatActivity() {
         val isTotalMoreThanVisible = totalItemCount >= (totalMovies ?: 0)
 
         return isNotLoadingAndNotLastPage && isAtLastItem && isTotalMoreThanVisible && isScrolling
-    }
+    }*/
 
     private fun checkLastPage(pages: Int?): Boolean {
         val totalPages = (pages ?: 0) / PAGE_SIZE + 2

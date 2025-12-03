@@ -43,7 +43,7 @@ abstract class PaginationScrollListener(
             visibleItemCount =
                 (linearLayoutManager as LinearLayoutManager).childCount
             totalItemCount =
-                (linearLayoutManager as LinearLayoutManager ).itemCount
+                (linearLayoutManager as LinearLayoutManager).itemCount
 
             if (shouldPaginate()) {
                 loadMoreItems()
@@ -66,7 +66,7 @@ abstract class PaginationScrollListener(
     }
 
     private fun shouldPaginate(): Boolean {
-        if(linearLayoutManager != null){
+        if (linearLayoutManager != null) {
             isNotLoadingAndNotLastPage = !isLoading() && !isLastPage()
             isAtLastItem = firstVisibleItemPosition + visibleItemCount >= totalItemCount
             isNotAtBeginning = firstVisibleItemPosition >= 0
@@ -76,7 +76,7 @@ abstract class PaginationScrollListener(
                     && isTotalMoreThanVisible && isScrolling
         }
 
-        if(gridLayoutManager != null){
+        if (gridLayoutManager != null) {
             isNotLoadingAndNotLastPage = !isLoading() && !isLastPage()
             isAtLastItem = lastVisibleItemPosition == totalItemCount
             isTotalMoreThanVisible = totalItemCount >= (totalItems() ?: 0)
@@ -84,7 +84,6 @@ abstract class PaginationScrollListener(
             return isNotLoadingAndNotLastPage && isAtLastItem
                     && isTotalMoreThanVisible && isScrolling
         }
-
 
         return false
     }
