@@ -18,7 +18,6 @@ abstract class PaginationScrollListener(
     private var isNotAtBeginning: Boolean = false
     private var isAtLastItem: Boolean = false
     private var isTotalMoreThanVisible: Boolean = false
-
     private var isScrolling: Boolean = false
 
     abstract fun isLoading(): Boolean
