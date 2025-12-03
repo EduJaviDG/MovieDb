@@ -4,10 +4,12 @@ import android.widget.AbsListView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.LayoutManager
+import com.example.mymovies.util.LayoutManagerType.*
 
 abstract class PaginationScrollListener(
-    private val linearLayoutManager: LinearLayoutManager? = null,
-    private val gridLayoutManager: GridLayoutManager? = null,
+    private val layoutManagerType: LayoutManagerType,
+    private val layoutManager: LayoutManager
 ) : RecyclerView.OnScrollListener() {
     private var firstVisibleItemPosition: Int = 0
     private var lastVisibleItemPosition: Int = 0
@@ -36,55 +38,67 @@ abstract class PaginationScrollListener(
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         super.onScrolled(recyclerView, dx, dy)
 
-        if (linearLayoutManager != null) {
-            firstVisibleItemPosition =
-                (linearLayoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-            visibleItemCount =
-                (linearLayoutManager as LinearLayoutManager).childCount
-            totalItemCount =
-                (linearLayoutManager as LinearLayoutManager).itemCount
+        when (layoutManagerType) {
+            LINEAR_LAYOUT -> {
+                firstVisibleItemPosition =
+                    (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                visibleItemCount =
+                    (layoutManager as LinearLayoutManager).childCount
+                totalItemCount =
+                    (layoutManager as LinearLayoutManager).itemCount
 
-            if (shouldPaginate()) {
-                loadMoreItems()
-                isScrolling = false
+                if (shouldPaginate()) {
+                    loadMoreItems()
+                    isScrolling = false
+                }
             }
-        }
 
-        if (gridLayoutManager != null) {
-            lastVisibleItemPosition =
-                (gridLayoutManager as GridLayoutManager).findLastVisibleItemPosition() + 1
-            totalItemCount =
-                (gridLayoutManager as GridLayoutManager).itemCount
+            GRID_LAYOUT -> {
+                lastVisibleItemPosition =
+                    (layoutManager as GridLayoutManager).findLastVisibleItemPosition() + 1
+                totalItemCount =
+                    (layoutManager as GridLayoutManager).itemCount
 
-            if (shouldPaginate()) {
-                loadMoreItems()
-                isScrolling = false
+                if (shouldPaginate()) {
+                    loadMoreItems()
+                    isScrolling = false
+                }
             }
-        }
 
+            STAGGERED_LAYOUT -> Unit
+        }
     }
 
     private fun shouldPaginate(): Boolean {
-        if (linearLayoutManager != null) {
-            isNotLoadingAndNotLastPage = !isLoading() && !isLastPage()
-            isAtLastItem = firstVisibleItemPosition + visibleItemCount >= totalItemCount
-            isNotAtBeginning = firstVisibleItemPosition >= 0
-            isTotalMoreThanVisible = totalItemCount >= (totalItems() ?: 0)
+        when (layoutManagerType) {
+            LINEAR_LAYOUT -> {
+                isNotLoadingAndNotLastPage = !isLoading() && !isLastPage()
+                isAtLastItem = firstVisibleItemPosition + visibleItemCount >= totalItemCount
+                isNotAtBeginning = firstVisibleItemPosition >= 0
+                isTotalMoreThanVisible = totalItemCount >= (totalItems() ?: 0)
 
-            return isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning
-                    && isTotalMoreThanVisible && isScrolling
-        }
+                return isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning
+                        && isTotalMoreThanVisible && isScrolling
+            }
 
-        if (gridLayoutManager != null) {
-            isNotLoadingAndNotLastPage = !isLoading() && !isLastPage()
-            isAtLastItem = lastVisibleItemPosition == totalItemCount
-            isTotalMoreThanVisible = totalItemCount >= (totalItems() ?: 0)
+            GRID_LAYOUT -> {
+                isNotLoadingAndNotLastPage = !isLoading() && !isLastPage()
+                isAtLastItem = lastVisibleItemPosition == totalItemCount
+                isTotalMoreThanVisible = totalItemCount >= (totalItems() ?: 0)
 
-            return isNotLoadingAndNotLastPage && isAtLastItem
-                    && isTotalMoreThanVisible && isScrolling
+                return isNotLoadingAndNotLastPage && isAtLastItem
+                        && isTotalMoreThanVisible && isScrolling
+            }
+
+            STAGGERED_LAYOUT -> Unit
+
         }
 
         return false
     }
 
+}
+
+enum class LayoutManagerType {
+    LINEAR_LAYOUT, GRID_LAYOUT, STAGGERED_LAYOUT
 }

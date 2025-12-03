@@ -11,18 +11,15 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.Menu
-import android.view.View
 import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
-import android.widget.AbsListView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.edu.running.utils.MockLocationProvider
 import com.example.mymovies.BuildConfig
@@ -35,9 +32,9 @@ import com.example.mymovies.ui.detail.DetailActivity
 import com.example.mymovies.util.Constants.Companion.DEFAULT_API_REGION
 import com.example.mymovies.util.Constants.Companion.DENIED
 import com.example.mymovies.util.Constants.Companion.GRANTED
-import com.example.mymovies.util.Constants.Companion.INITIAL_PAGE
 import com.example.mymovies.util.Constants.Companion.PAGE_SIZE
 import com.example.mymovies.util.Constants.Companion.PERMANENTLY_DENIED
+import com.example.mymovies.util.LayoutManagerType.GRID_LAYOUT
 import com.example.mymovies.util.PaginationScrollListener
 import com.example.mymovies.util.Resource
 import com.example.mymovies.util.hasPermission
@@ -146,9 +143,7 @@ class MainActivity : AppCompatActivity() {
         binding.rvPopularMovies.apply {
             adapter = movieAdapter
             layoutManager = mLayoutManager
-            addOnScrollListener(object : PaginationScrollListener(
-                gridLayoutManager = mLayoutManager as GridLayoutManager
-            ) {
+            addOnScrollListener(object : PaginationScrollListener(GRID_LAYOUT, mLayoutManager) {
                 override fun isLoading(): Boolean {
                     return isLoading
                 }
