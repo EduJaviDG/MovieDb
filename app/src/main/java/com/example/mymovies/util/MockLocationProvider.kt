@@ -1,4 +1,4 @@
-package com.edu.running.utils
+package com.example.mymovies.util
 
 import android.Manifest
 import android.annotation.SuppressLint

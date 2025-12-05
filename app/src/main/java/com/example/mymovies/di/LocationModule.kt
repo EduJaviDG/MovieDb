@@ -3,7 +3,7 @@ package com.example.mymovies.di
 import android.app.Application
 import android.content.Context
 import android.location.LocationManager
-import com.edu.running.utils.MockLocationProvider
+import com.example.mymovies.util.MockLocationProvider
 import com.example.mymovies.data.location.DefaultLocationTracker
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices

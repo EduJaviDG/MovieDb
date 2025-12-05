@@ -14,14 +14,12 @@ import android.view.Menu
 import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
-import com.edu.running.utils.MockLocationProvider
 import com.example.mymovies.BuildConfig
 import com.example.mymovies.R
 import com.example.mymovies.data.location.DefaultLocationTracker
@@ -30,11 +28,9 @@ import com.example.mymovies.databinding.ActivityMainBinding
 import com.example.mymovies.domain.model.Movie
 import com.example.mymovies.ui.detail.DetailActivity
 import com.example.mymovies.util.Constants.Companion.DEFAULT_API_REGION
-import com.example.mymovies.util.Constants.Companion.DENIED
-import com.example.mymovies.util.Constants.Companion.GRANTED
 import com.example.mymovies.util.Constants.Companion.PAGE_SIZE
-import com.example.mymovies.util.Constants.Companion.PERMANENTLY_DENIED
 import com.example.mymovies.util.LayoutManagerType.GRID_LAYOUT
+import com.example.mymovies.util.MockLocationProvider
 import com.example.mymovies.util.PaginationScrollListener
 import com.example.mymovies.util.PermissionRequester
 import com.example.mymovies.util.Resource
