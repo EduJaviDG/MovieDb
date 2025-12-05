@@ -36,6 +36,7 @@ import com.example.mymovies.util.Constants.Companion.PAGE_SIZE
 import com.example.mymovies.util.Constants.Companion.PERMANENTLY_DENIED
 import com.example.mymovies.util.LayoutManagerType.GRID_LAYOUT
 import com.example.mymovies.util.PaginationScrollListener
+import com.example.mymovies.util.PermissionRequester
 import com.example.mymovies.util.Resource
 import com.example.mymovies.util.hasPermission
 import com.example.mymovies.util.openAppSettings
@@ -85,30 +86,14 @@ class MainActivity : AppCompatActivity() {
     private var appName: String = ""
     private var permission: String = ""
 
+    private val coarsePermission: PermissionRequester =
+        PermissionRequester(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+    private val finePermission: PermissionRequester =
+        PermissionRequester(this, Manifest.permission.ACCESS_FINE_LOCATION)
+
     private val granted: () -> Unit = { handlingPermissionsGranted() }
     private val rationale: () -> Unit = { showDialog() }
     private val denied: () -> Unit = { handlingPermissionsDenied() }
-
-    private val permissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        when {
-            isGranted -> {
-                granted()
-                Log.d(TAG, "Permission: $permission, $GRANTED")
-            }
-
-            shouldShowRequestPermissionRationale(permission) -> {
-                rationale()
-                Log.d(TAG, "Permission: $permission, $DENIED")
-            }
-
-            else -> {
-                denied()
-                Log.d(TAG, "Permission: $permission, $PERMANENTLY_DENIED")
-            }
-        }
-    }
 
     private val movieListener = object : MovieClickListener {
         override fun onClickMovie(item: Movie?) {
@@ -124,6 +109,7 @@ class MainActivity : AppCompatActivity() {
         appName = getString(R.string.app_name)
 
         initClient()
+        setPermission()
         requestPermission()
         initRecycle()
         refreshLayout()
@@ -185,6 +171,11 @@ class MainActivity : AppCompatActivity() {
         mockLocationProvider.pushLocation(lat = 60.192059, lon = 24.945831)
     }
 
+    private fun setPermission() {
+        coarsePermission.setInfoPermission(granted, rationale, denied)
+        finePermission.setInfoPermission(granted, rationale, denied)
+    }
+
     private fun callService(defaultRegion: String? = null) {
         val headers = mapOf<String, String>(
             "accept" to "application/json",
@@ -219,14 +210,12 @@ class MainActivity : AppCompatActivity() {
         when {
             !hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION) -> {
                 permission = Manifest.permission.ACCESS_COARSE_LOCATION
-
-                permissionLauncher.launch(permission)
+                coarsePermission.runWithPermission()
             }
 
             !hasPermission(Manifest.permission.ACCESS_FINE_LOCATION) -> {
                 permission = Manifest.permission.ACCESS_FINE_LOCATION
-
-                permissionLauncher.launch(permission)
+                finePermission.runWithPermission()
             }
 
             else -> {
@@ -239,8 +228,7 @@ class MainActivity : AppCompatActivity() {
         when (permission) {
             Manifest.permission.ACCESS_COARSE_LOCATION -> {
                 permission = Manifest.permission.ACCESS_FINE_LOCATION
-
-                permissionLauncher.launch(permission)
+                finePermission.runWithPermission()
             }
 
             Manifest.permission.ACCESS_FINE_LOCATION -> {

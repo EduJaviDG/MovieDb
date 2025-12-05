@@ -1,9 +1,14 @@
 package com.example.mymovies.util
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.mymovies.ui.main.MainActivity
 
 class PermissionRequester(activity: ComponentActivity, private val permission: String) {
+    companion object{
+        const val TAG = "PermissionRequester"
+    }
 
     private var onGranted: () -> Unit = {}
     private var onRationale: () -> Unit = {}
@@ -13,9 +18,19 @@ class PermissionRequester(activity: ComponentActivity, private val permission: S
     private val permissionLauncher = activity.registerForActivityResult(
         ActivityResultContracts.RequestPermission()){ isGranted ->
         when{
-            isGranted -> onGranted()
-            activity.shouldShowRequestPermissionRationale(permission) -> onRationale()
-            else -> onDenied()
+            isGranted ->{
+                onGranted()
+                Log.d(TAG, "Permission: $permission, ${Constants.GRANTED}")
+            }
+            activity.shouldShowRequestPermissionRationale(permission) ->{
+                onRationale()
+                Log.d(TAG, "Permission: $permission, ${Constants.DENIED}")
+
+            }
+            else ->{
+                onDenied()
+                Log.d(TAG, "Permission: $permission, ${Constants.PERMANENTLY_DENIED}")
+            }
         }
     }
 
