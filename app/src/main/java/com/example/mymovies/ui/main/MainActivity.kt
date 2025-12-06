@@ -29,6 +29,7 @@ import com.example.mymovies.domain.model.Movie
 import com.example.mymovies.ui.detail.DetailActivity
 import com.example.mymovies.util.Constants.Companion.DEFAULT_API_REGION
 import com.example.mymovies.util.Constants.Companion.PAGE_SIZE
+import com.example.mymovies.util.InfoPermissionListener
 import com.example.mymovies.util.LayoutManagerType.GRID_LAYOUT
 import com.example.mymovies.util.MockLocationProvider
 import com.example.mymovies.util.PaginationScrollListener
@@ -87,9 +88,20 @@ class MainActivity : AppCompatActivity() {
     private val finePermission: PermissionRequester =
         PermissionRequester(this, Manifest.permission.ACCESS_FINE_LOCATION)
 
-    private val granted: () -> Unit = { handlingPermissionsGranted() }
-    private val rationale: () -> Unit = { showDialog() }
-    private val denied: () -> Unit = { handlingPermissionsDenied() }
+    private val infoPermissionListener = object : InfoPermissionListener {
+        override fun onGranted() {
+            handlingPermissionsGranted()
+        }
+
+        override fun onRationale() {
+            showDialog()
+        }
+
+        override fun onDenied() {
+            handlingPermissionsDenied()
+        }
+
+    }
 
     private val movieListener = object : MovieClickListener {
         override fun onClickMovie(item: Movie?) {
@@ -167,9 +179,9 @@ class MainActivity : AppCompatActivity() {
         mockLocationProvider.pushLocation(lat = 60.192059, lon = 24.945831)
     }
 
-    private fun setPermission() {
-        coarsePermission.setInfoPermission(granted, rationale, denied)
-        finePermission.setInfoPermission(granted, rationale, denied)
+    private fun setPermission(){
+        coarsePermission.setListener(infoPermissionListener)
+        finePermission.setListener(infoPermissionListener)
     }
 
     private fun callService(defaultRegion: String? = null) {
