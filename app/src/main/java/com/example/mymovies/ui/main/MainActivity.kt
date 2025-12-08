@@ -145,7 +145,9 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun loadMoreItems() {
-                    callService()
+                    getPopularMovies()
+                    showPopularMovies()
+                    //callService()
                 }
 
             })
@@ -172,7 +174,7 @@ class MainActivity : AppCompatActivity() {
         finePermission.setListener(infoPermissionListener)
     }
 
-    private fun callService(defaultRegion: String? = null) {
+    private fun getPopularMovies(defaultRegion: String? = null) {
         val headers = mapOf<String, String>(
             "accept" to "application/json",
             "Authorization" to accessToken
@@ -184,7 +186,7 @@ class MainActivity : AppCompatActivity() {
             viewModel.language = getApiLanguage()
             viewModel.getPopularMoviesWithApiKey()
 
-            showPopularMovies()
+            //showPopularMovies()
 
         } else {
             lifecycleScope.launch {
@@ -196,7 +198,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.language = getApiLanguage()
                 viewModel.getPopularMoviesWithApiKey()
 
-                showPopularMovies()
+                //showPopularMovies()
             }
         }
     }
@@ -214,7 +216,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             else -> {
-                callService(DEFAULT_API_REGION)
+                getPopularMovies(DEFAULT_API_REGION)
+                showPopularMovies()
+                //callService(DEFAULT_API_REGION)
             }
         }
     }
@@ -228,7 +232,9 @@ class MainActivity : AppCompatActivity() {
 
             Manifest.permission.ACCESS_FINE_LOCATION -> {
                 provideMockLocation()
-                callService()
+                getPopularMovies()
+                showPopularMovies()
+                //callService()
             }
         }
     }
@@ -236,8 +242,9 @@ class MainActivity : AppCompatActivity() {
     private fun handlingPermissionsDenied() {
         val appName = packageName
         toast(getString(R.string.message_toast, appName))
-
-        callService(DEFAULT_API_REGION)
+        getPopularMovies(DEFAULT_API_REGION)
+        showPopularMovies()
+        //callService(DEFAULT_API_REGION)
     }
 
     private suspend fun getRegionFromLocation(location: Location?): String? {
@@ -356,7 +363,11 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun actionClick() = callService(DEFAULT_API_REGION)
+    private fun actionClick() {
+        getPopularMovies(DEFAULT_API_REGION)
+        showPopularMovies()
+        //callService(DEFAULT_API_REGION)
+    }
 
     private fun checkLastPage(pages: Int?): Boolean {
         val totalPages = (pages ?: 0) / PAGE_SIZE + 2
