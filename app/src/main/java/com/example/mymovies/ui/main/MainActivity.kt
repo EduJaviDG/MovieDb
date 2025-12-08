@@ -64,8 +64,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var mockLocationProvider: MockLocationProvider
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var locationRequest: LocationRequest
     private lateinit var movieAdapter: MovieAdapter
     private lateinit var mLayoutManager: LayoutManager
 
@@ -80,7 +78,6 @@ class MainActivity : AppCompatActivity() {
     private val apiKey = BuildConfig.API_KEY
     private val accessToken = BuildConfig.ACCESS_TOKEN
 
-    private var appName: String = ""
     private var permission: String = ""
 
     private val coarsePermission: PermissionRequester =
@@ -114,9 +111,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        appName = getString(R.string.app_name)
-
-        initClient()
         setPermission()
         requestPermission()
         initRecycle()
@@ -158,12 +152,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         movieAdapter.setListener(movieListener)
-
-    }
-
-    private fun initClient() {
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        locationRequest = LocationRequest()
 
     }
 
@@ -247,6 +235,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handlingPermissionsDenied() {
+        val appName = packageName
         toast(getString(R.string.message_toast, appName))
 
         callService(DEFAULT_API_REGION)
