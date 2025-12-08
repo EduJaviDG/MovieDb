@@ -147,7 +147,6 @@ class MainActivity : AppCompatActivity() {
                 override fun loadMoreItems() {
                     getPopularMovies()
                     showPopularMovies()
-                    //callService()
                 }
 
             })
@@ -169,7 +168,7 @@ class MainActivity : AppCompatActivity() {
         mockLocationProvider.pushLocation(lat = 60.192059, lon = 24.945831)
     }
 
-    private fun setPermission(){
+    private fun setPermission() {
         coarsePermission.setListener(infoPermissionListener)
         finePermission.setListener(infoPermissionListener)
     }
@@ -186,8 +185,6 @@ class MainActivity : AppCompatActivity() {
             viewModel.language = getApiLanguage()
             viewModel.getPopularMoviesWithApiKey()
 
-            //showPopularMovies()
-
         } else {
             lifecycleScope.launch {
                 val location = defaultLocationTracker.getLastLocation()
@@ -198,7 +195,6 @@ class MainActivity : AppCompatActivity() {
                 viewModel.language = getApiLanguage()
                 viewModel.getPopularMoviesWithApiKey()
 
-                //showPopularMovies()
             }
         }
     }
@@ -218,7 +214,6 @@ class MainActivity : AppCompatActivity() {
             else -> {
                 getPopularMovies(DEFAULT_API_REGION)
                 showPopularMovies()
-                //callService(DEFAULT_API_REGION)
             }
         }
     }
@@ -233,8 +228,6 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.ACCESS_FINE_LOCATION -> {
                 provideMockLocation()
                 getPopularMovies()
-                showPopularMovies()
-                //callService()
             }
         }
     }
@@ -244,7 +237,6 @@ class MainActivity : AppCompatActivity() {
         toast(getString(R.string.message_toast, appName))
         getPopularMovies(DEFAULT_API_REGION)
         showPopularMovies()
-        //callService(DEFAULT_API_REGION)
     }
 
     private suspend fun getRegionFromLocation(location: Location?): String? {
@@ -366,7 +358,6 @@ class MainActivity : AppCompatActivity() {
     private fun actionClick() {
         getPopularMovies(DEFAULT_API_REGION)
         showPopularMovies()
-        //callService(DEFAULT_API_REGION)
     }
 
     private fun checkLastPage(pages: Int?): Boolean {
