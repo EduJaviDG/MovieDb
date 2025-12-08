@@ -179,14 +179,13 @@ class MainActivity : AppCompatActivity() {
         )
 
         if (defaultRegion != null) {
-            lifecycleScope.launch {
-                viewModel.apikey = apiKey
-                viewModel.region = defaultRegion
-                viewModel.language = getApiLanguage()
-                viewModel.getPopularMoviesWithApiKey()
+            viewModel.apikey = apiKey
+            viewModel.region = defaultRegion
+            viewModel.language = getApiLanguage()
+            viewModel.getPopularMoviesWithApiKey()
 
-                showPopularMovies()
-            }
+            showPopularMovies()
+
         } else {
             lifecycleScope.launch {
                 val location = defaultLocationTracker.getLastLocation()
