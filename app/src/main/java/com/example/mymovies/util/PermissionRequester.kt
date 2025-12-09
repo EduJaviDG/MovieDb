@@ -12,8 +12,9 @@ class PermissionRequester(activity: ComponentActivity, private val permission: S
 
     private var infoPermissionListener: InfoPermissionListener? = null
 
-    private val permissionLauncher = activity.registerForActivityResult(
-        ActivityResultContracts.RequestPermission()){ isGranted ->
+    private val permissionLauncher = activity.registerActivityResultLauncher(
+       contract = ActivityResultContracts.RequestPermission(),
+        callback = { isGranted ->
         when{
             isGranted ->{
                 infoPermissionListener?.onGranted()
@@ -29,13 +30,15 @@ class PermissionRequester(activity: ComponentActivity, private val permission: S
                 Log.d(TAG, "Permission: $permission, ${Constants.PERMANENTLY_DENIED}")
             }
         }
-    }
+    })
 
     fun setListener(listener: InfoPermissionListener) {
         infoPermissionListener = listener
     }
 
     fun runWithPermission() = permissionLauncher.launch(permission)
+
+    fun unregister() = permissionLauncher.unregister()
 
 }
 
