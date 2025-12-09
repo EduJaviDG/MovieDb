@@ -130,6 +130,12 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        coarsePermission.unregister()
+        finePermission.unregister()
+    }
+
     private fun initRecycle() {
         movieAdapter = MovieAdapter()
         mLayoutManager = GridLayoutManager(this, 3)
