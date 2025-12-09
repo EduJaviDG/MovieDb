@@ -8,8 +8,13 @@ import android.provider.Settings
 import android.text.SpannableStringBuilder
 import android.view.Gravity
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.content.ContextCompat
 import androidx.core.text.bold
+import java.util.UUID
 
 inline fun Context.toast(message: CharSequence) =
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
@@ -22,7 +27,7 @@ inline fun Context.openAppSettings() {
     }.let(::startActivity)
 }
 
-inline fun SpannableStringBuilder.appendInfo(context: Context, stringRes: Int, value: String?){
+inline fun SpannableStringBuilder.appendInfo(context: Context, stringRes: Int, value: String?) {
     bold {
         append(context.resources.getString(stringRes))
         append(": ")
@@ -35,3 +40,11 @@ inline fun Context.hasPermission(permission: String): Boolean =
         this,
         permission
     ) == PackageManager.PERMISSION_GRANTED
+
+inline fun <I, O> ComponentActivity.registerActivityResultLauncher(
+    contract: ActivityResultContract<I, O>,
+    callback: ActivityResultCallback<O>
+): ActivityResultLauncher<I> {
+    val key = UUID.randomUUID().toString()
+    return activityResultRegistry.register(key, contract, callback)
+}
