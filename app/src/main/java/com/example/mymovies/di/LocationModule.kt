@@ -38,7 +38,7 @@ object LocationModule {
     @Provides
     fun provideMockLocationProvider(@ApplicationContext context: Context): MockLocationProvider =
         MockLocationProvider(
-            LocationManager.GPS_PROVIDER,
+            LocationManager.NETWORK_PROVIDER,
             context
         )
 }
