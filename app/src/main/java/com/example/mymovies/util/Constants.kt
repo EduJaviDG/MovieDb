@@ -12,5 +12,6 @@ class Constants {
         const val LOADING_DATA_ERROR = "Error loading data"
         const val PAGE_SIZE = 20
         const val INITIAL_PAGE = 1
+        const val HIDE_SHIMMER_DELAY = 4000L
     }
 }

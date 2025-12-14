@@ -28,6 +28,7 @@ import com.example.mymovies.databinding.ActivityMainBinding
 import com.example.mymovies.domain.model.Movie
 import com.example.mymovies.ui.detail.DetailActivity
 import com.example.mymovies.util.Constants.Companion.DEFAULT_API_REGION
+import com.example.mymovies.util.Constants.Companion.HIDE_SHIMMER_DELAY
 import com.example.mymovies.util.Constants.Companion.PAGE_SIZE
 import com.example.mymovies.util.InfoPermissionListener
 import com.example.mymovies.util.LayoutManagerType.GRID_LAYOUT
@@ -335,7 +336,7 @@ class MainActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             binding.shlLoading.visibility = GONE
             binding.rvPopularMovies.visibility = VISIBLE
-        }, 4000)
+        }, HIDE_SHIMMER_DELAY)
 
     }
 
