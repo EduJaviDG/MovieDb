@@ -348,8 +348,8 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this, R.style.Custom_Alert_Dialog)
             .setTitle(R.string.title_dialog)
             .setMessage(R.string.message_dialog)
-            .setPositiveButton(R.string.title_positive_button_dialog, { _, _ -> openAppSettings() })
-            .setNegativeButton(R.string.title_negative_button_dialog, { _, _ -> showSnackBar() })
+            .setPositiveButton(R.string.title_positive_button_dialog) { _, _ -> openAppSettings() }
+            .setNegativeButton(R.string.title_negative_button_dialog) { _, _ -> showSnackBar() }
             .setCancelable(false)
             .show()
     }
